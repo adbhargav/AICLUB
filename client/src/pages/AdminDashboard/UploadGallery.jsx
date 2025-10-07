@@ -11,7 +11,7 @@ export default function UploadGallery() {
   const [editDescription, setEditDescription] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/gallery")
+    fetch("https://aiclub-y4ox.onrender.com/api/gallery")
       .then((res) => res.json())
       .then((data) => setGallery(data))
       .catch((err) => console.error("Fetch error:", err));
