@@ -7,7 +7,7 @@ export default function Team() {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/team");
+        const res = await fetch("https://aiclub-y4ox.onrender.com/api/team");
         const data = await res.json();
         setMembers(data);
       } catch (error) {
