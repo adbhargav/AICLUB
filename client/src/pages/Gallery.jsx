@@ -7,7 +7,7 @@ export default function Gallery() {
   useEffect(() => {
     const fetchGallery = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/gallery");
+        const res = await fetch("https://aiclub-y4ox.onrender.com/api/gallery");
         const data = await res.json();
         setImages(data);
       } catch (error) {
