@@ -6,6 +6,7 @@ const teamSchema = new mongoose.Schema({
   branch: { type: String },
   year: { type: String },
   profileImageURL: { type: String },
+  cloudinaryId: { type: String }, // Cloudinary public_id for deletion
   contact: { type: String }
 }, { timestamps: true });
 

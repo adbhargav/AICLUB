@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   branch: { type: String, required: true },
   year: { type: String, required: true },
   profileImageURL: { type: String },
+  cloudinaryId: { type: String }, // Cloudinary public_id for deletion
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["student","admin"], default: "student" },

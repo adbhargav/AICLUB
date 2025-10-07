@@ -3,11 +3,16 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import multer from "multer";
-import fs from "fs";
+import streamifier from "streamifier";
+import cloudinary from "../config/cloudinary.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
 // Sign Up
 router.post("/signup", upload.single("profileImage"), async (req, res) => {
@@ -19,30 +24,54 @@ router.post("/signup", upload.single("profileImage"), async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let profileImageURL = "";
     if (req.file) {
-      // Convert image to Base64 and store in MongoDB
-      const imageBuffer = fs.readFileSync(req.file.path);
-      const base64Image = imageBuffer.toString('base64');
-      const mimeType = req.file.mimetype;
-      profileImageURL = `data:${mimeType};base64,${base64Image}`;
-      
-      // Delete the temporary file
-      fs.unlinkSync(req.file.path);
+      // Upload to Cloudinary using stream
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "rgm-ai-club/users",
+          resource_type: "image",
+        },
+        async (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return res.status(500).json({ message: "Failed to upload profile image" });
+          }
+          
+          try {
+            const user = await User.create({
+              name,
+              registerNumber,
+              branch,
+              year,
+              email,
+              password: hashedPassword,
+              profileImageURL: result.secure_url,
+              cloudinaryId: result.public_id,
+            });
+
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "fallback_secret_key_for_development", { expiresIn: "7d" });
+            return res.status(201).json({ token, user });
+          } catch (dbError) {
+            console.error("Database error:", dbError);
+            await cloudinary.uploader.destroy(result.public_id);
+            return res.status(500).json({ message: "Failed to create user" });
+          }
+        }
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    } else {
+      const user = await User.create({
+        name,
+        registerNumber,
+        branch,
+        year,
+        email,
+        password: hashedPassword,
+      });
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "fallback_secret_key_for_development", { expiresIn: "7d" });
+      res.status(201).json({ token, user });
     }
-
-    const user = await User.create({
-      name,
-      registerNumber,
-      branch,
-      year,
-      email,
-      password: hashedPassword,
-      profileImageURL,
-    });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "fallback_secret_key_for_development", { expiresIn: "7d" });
-    res.status(201).json({ token, user });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

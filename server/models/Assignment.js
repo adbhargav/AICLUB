@@ -6,6 +6,7 @@ const assignmentSchema = new mongoose.Schema({
   dueDate: { type: Date, required: true },
   link: { type: String }, // Assignment link
   fileURL: { type: String }, // Optional: PDF or doc link
+  cloudinaryId: { type: String }, // Cloudinary public_id for deletion
 }, { timestamps: true });
 
 export default mongoose.model("Assignment", assignmentSchema);
