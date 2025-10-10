@@ -29,7 +29,7 @@ export default function ViewProjects() {
 
     try {
       await api.delete(`/projects/${id}`);
-      setProjects(projects.filter(p => p._id !== id));
+      setProjects((prev) => prev.filter((p) => p._id !== id));
       setSuccess("Project deleted successfully!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -49,13 +49,12 @@ export default function ViewProjects() {
   return (
     <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
       <h2 className="text-2xl font-semibold mb-4 text-blue-300">Student Projects</h2>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-900 border border-red-700 text-red-300 rounded-lg">
           {error}
         </div>
       )}
-
       {success && (
         <div className="mb-4 p-3 bg-green-900 border border-green-700 text-green-300 rounded-lg">
           {success}
@@ -67,17 +66,27 @@ export default function ViewProjects() {
       ) : (
         <div className="space-y-4">
           {projects.map((project) => (
-            <div key={project._id} className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
+            <div
+              key={project._id}
+              className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition"
+            >
               <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-blue-400 mb-2">{project.title}</h3>
+                  <h3 className="text-lg font-semibold text-blue-400 mb-2">
+                    {project.title}
+                  </h3>
                   {project.description && (
-                    <p className="text-gray-300 text-sm mb-2">{project.description}</p>
+                    <p className="text-gray-300 text-sm mb-2">
+                      {project.description}
+                    </p>
                   )}
                   <div className="text-sm text-gray-500">
-                    <p>Submitted by: {project.submittedBy?.name || "Unknown"}</p>
-                    <p>Email: {project.submittedBy?.email || "N/A"}</p>
-                    <p>Submitted: {new Date(project.createdAt).toLocaleString()}</p>
+                    <p>Submitted by: {project.student?.name || "Unknown"}</p>
+                    <p>Email: {project.student?.email || "N/A"}</p>
+                    <p>
+                      Submitted:{" "}
+                      {new Date(project.createdAt).toLocaleString()}
+                    </p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
