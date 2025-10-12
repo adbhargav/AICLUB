@@ -59,7 +59,7 @@ export default function Notices() {
                   rel="noreferrer"
                   className="text-blue-500 underline mt-2 block"
                 >
-                  Read More
+                  
                 </a>
               )}
             </li>
