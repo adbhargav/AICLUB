@@ -8,9 +8,9 @@ export default function ViewContacts() {
   const [isAdmin, setIsAdmin] = useState(false); // check admin status
 
   useEffect(() => {
-    // Example: check admin status from localStorage (adjust to your auth logic)
+    // Get logged-in user from localStorage (adjust if you store differently)
     const user = JSON.parse(localStorage.getItem("user"));
-    setIsAdmin(user?.isAdmin || false);
+    setIsAdmin(user?.role === "admin");
 
     const fetchContacts = async () => {
       try {
@@ -72,7 +72,10 @@ export default function ViewContacts() {
       ) : (
         <div className="space-y-4">
           {contacts.map((contact) => (
-            <div key={contact._id} className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
+            <div
+              key={contact._id}
+              className="p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition relative"
+            >
               <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -84,6 +87,7 @@ export default function ViewContacts() {
                     <p>Received: {new Date(contact.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
+
                 <div className="flex flex-col gap-2 items-end">
                   <a
                     href={`mailto:${contact.email}`}
