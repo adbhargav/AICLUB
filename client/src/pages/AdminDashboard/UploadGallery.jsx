@@ -29,7 +29,7 @@ export default function UploadGallery() {
 
     try {
       setUploading(true);
-      const res = await fetch("http://localhost:5000/api/gallery", {
+      const res = await fetch("https://aiclub-y4ox.onrender.com/api/gallery", {
         method: "POST",
         body: formData,
       });
