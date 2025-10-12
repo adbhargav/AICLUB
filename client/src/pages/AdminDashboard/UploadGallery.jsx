@@ -55,7 +55,7 @@ export default function UploadGallery() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this image?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/gallery/${id}`, {
+      const res = await fetch(`https://aiclub-y4ox.onrender.com/api/gallery/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -79,7 +79,7 @@ export default function UploadGallery() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5000/api/gallery/${editingId}`, {
+      const res = await fetch(`https://aiclub-y4ox.onrender.com/api/gallery/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
