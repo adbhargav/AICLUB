@@ -5,8 +5,13 @@ export default function ViewContacts() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // check admin status
 
   useEffect(() => {
+    // Example: check admin status from localStorage (adjust to your auth logic)
+    const user = JSON.parse(localStorage.getItem("user"));
+    setIsAdmin(user?.isAdmin || false);
+
     const fetchContacts = async () => {
       try {
         const res = await api.get("/contact");
@@ -14,7 +19,11 @@ export default function ViewContacts() {
         setError("");
       } catch (err) {
         console.error("Error fetching contacts:", err);
-        setError("Failed to load contact messages. Please try again.");
+        setError(
+          err.response?.status === 401 || err.response?.status === 403
+            ? "Access denied. Admins only."
+            : "Failed to load contact messages. Please try again."
+        );
       } finally {
         setLoading(false);
       }
@@ -22,15 +31,20 @@ export default function ViewContacts() {
     fetchContacts();
   }, []);
 
-  // Delete contact
+  // Delete contact (admin only)
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this message?")) return;
     try {
       await api.delete(`/contact/${id}`);
       setContacts(contacts.filter((c) => c._id !== id));
+      alert("Contact deleted successfully!");
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete contact message.");
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        alert("You are not authorized to delete this contact message.");
+      } else {
+        alert("Failed to delete contact message. Please try again.");
+      }
     }
   };
 
@@ -77,12 +91,16 @@ export default function ViewContacts() {
                   >
                     Reply via Email
                   </a>
-                  <button
-                    onClick={() => handleDelete(contact._id)}
-                    className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white text-center transition"
-                  >
-                    Delete
-                  </button>
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(contact._id)}
+                      className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white text-center transition"
+                    >
+                      Delete
+                    </button>
+                  )}
+
                   <span className="text-xs text-gray-400 text-center">
                     Click to open email client
                   </span>
