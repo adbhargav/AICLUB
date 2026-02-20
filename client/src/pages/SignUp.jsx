@@ -1,6 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import {
+  User,
+  Mail,
+  Lock,
+  GraduationCap,
+  Hash,
+  Camera,
+  ArrowRight,
+  Sparkles,
+  AlertCircle,
+  CheckCircle2,
+  Image as ImageIcon,
+  ChevronRight,
+  BookOpen
+} from "lucide-react";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -18,6 +33,7 @@ export default function Signup() {
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Handle input
   const handleChange = (e) => {
@@ -29,7 +45,6 @@ export default function Signup() {
     const file = e.target.files[0];
     if (file) {
       setProfileImage(file);
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -41,6 +56,8 @@ export default function Signup() {
   // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
@@ -48,6 +65,7 @@ export default function Signup() {
     }
 
     try {
+      setLoading(true);
       const data = new FormData();
       data.append("name", formData.name);
       data.append("email", formData.email);
@@ -59,148 +77,223 @@ export default function Signup() {
         data.append("profileImage", profileImage);
       }
 
-      const res = await api.post("/auth/signup", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      await api.post("/auth/signup", data, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setSuccess("Account created successfully!");
-      setError("");
+      setSuccess("Account created successfully! Redirecting...");
       setTimeout(() => navigate("/signin"), 2000);
     } catch (err) {
       setError(err.response?.data?.message || "Server error. Try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-black text-white min-h-screen flex items-center justify-center px-4">
-      <div className="bg-gray-900 p-8 rounded-2xl shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">
-          Sign Up
-        </h2>
+    <div className="relative min-h-screen bg-[#050505] text-white flex items-center justify-center px-4 py-32 overflow-hidden font-sans">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-600/10 blur-[150px] rounded-full animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[150px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-        {error && <p className="text-red-400 mb-4">{error}</p>}
-        {success && <p className="text-green-400 mb-4">{success}</p>}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Profile Image Upload */}
-          <div className="flex flex-col items-center mb-4">
-            <label className="text-gray-400 mb-2 text-sm">Profile Picture (Optional)</label>
-            <div className="flex items-center gap-4">
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-24 h-24 rounded-full object-cover border-2 border-blue-400"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center">
-                  <span className="text-gray-500 text-xs">No Image</span>
-                </div>
-              )}
-              <label className="cursor-pointer bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition">
-                Choose Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-            </div>
+      <div className="relative w-full max-w-2xl z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl shadow-2xl shadow-purple-500/20 mb-6 transform hover:rotate-6 transition-transform">
+            <Sparkles size={32} className="text-white" />
           </div>
+          <h1 className="text-4xl font-black tracking-tighter mb-2">
+            Join the <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Club</span>
+          </h1>
+          <p className="text-gray-500 font-medium tracking-wide uppercase text-xs">Innovation begins with your account</p>
+        </div>
 
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+        <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-3xl rounded-full -mr-32 -mt-32 group-hover:opacity-100 opacity-0 transition-opacity"></div>
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+          {(error || success) && (
+            <div className={`mb-8 p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500 ${error ? "bg-red-500/10 border border-red-500/20 text-red-400" : "bg-green-500/10 border border-green-500/20 text-green-400"
+              }`}>
+              {error ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
+              <p className="text-sm font-bold">{error || success}</p>
+            </div>
+          )}
 
-          <input
-            type="text"
-            name="branch"
-            placeholder="Branch (e.g. CSE, ECE)"
-            value={formData.branch}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Profile Image Section */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative group/avatar">
+                <div className="w-32 h-32 rounded-[32px] bg-white/5 border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden transition-all group-hover/avatar:border-purple-500/50">
+                  {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover transition-transform group-hover/avatar:scale-110" />
+                  ) : (
+                    <ImageIcon size={40} className="text-gray-600 group-hover/avatar:text-purple-400 transition-colors" />
+                  )}
+                </div>
+                <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center cursor-pointer shadow-lg hover:bg-purple-500 transition-colors border border-white/10">
+                  <Camera size={20} />
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                </label>
+              </div>
+              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Optional Profile Photo</p>
+            </div>
 
-          <select
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          >
-            <option value="">Select Year</option>
-            <option value="1st Year">1st Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="3rd Year">3rd Year</option>
-            <option value="4th Year">4th Year</option>
-          </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
+                <div className="relative group/input">
+                  <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                  />
+                </div>
+              </div>
 
-          <input
-            type="text"
-            name="registerNumber"
-            placeholder="Register Number"
-            value={formData.registerNumber}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Email</label>
+                <div className="relative group/input">
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                  />
+                </div>
+              </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+              {/* Branch */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Branch</label>
+                <div className="relative group/input">
+                  <BookOpen size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                  <input
+                    type="text"
+                    name="branch"
+                    placeholder="e.g. CSE"
+                    value={formData.branch}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                  />
+                </div>
+              </div>
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white"
-          />
+              {/* Year */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Current Year</label>
+                <div className="relative group/input">
+                  <GraduationCap size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                  <select
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-11 pr-10 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium appearance-none"
+                  >
+                    <option value="" className="bg-[#050505]">Select Year</option>
+                    <option value="1st Year" className="bg-[#050505]">1st Year</option>
+                    <option value="2nd Year" className="bg-[#050505]">2nd Year</option>
+                    <option value="3rd Year" className="bg-[#050505]">3rd Year</option>
+                    <option value="4th Year" className="bg-[#050505]">4th Year</option>
+                  </select>
+                </div>
+              </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition"
-          >
-            Create Account
-          </button>
-        </form>
+              {/* Register Number */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Reg Number</label>
+                <div className="relative group/input">
+                  <Hash size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                  <input
+                    type="text"
+                    name="registerNumber"
+                    placeholder="21XXXXXX"
+                    value={formData.registerNumber}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                  />
+                </div>
+              </div>
 
-        <p className="text-gray-400 text-center mt-4">
-          Already have an account?{" "}
-          <span
-            onClick={() => navigate("/signin")}
-            className="text-blue-400 cursor-pointer hover:underline"
-          >
-            Sign In
-          </span>
-        </p>
+              <div className="md:grid md:grid-cols-2 gap-4 md:col-span-2">
+                {/* Password */}
+                <div className="space-y-2 mb-6 md:mb-0">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Password</label>
+                  <div className="relative group/input">
+                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Confirm</label>
+                  <div className="relative group/input">
+                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-purple-400 transition-colors" />
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full relative group/btn overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 transition-transform group-hover/btn:scale-105 duration-300"></div>
+              <div className="relative flex items-center justify-center gap-2 py-4 rounded-2xl font-black text-white uppercase tracking-widest text-sm transition-all active:scale-95 disabled:opacity-50">
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    Create Account <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </div>
+            </button>
+          </form>
+
+          <footer className="mt-10 pt-8 border-t border-white/5 text-center">
+            <p className="text-sm font-medium text-gray-500">
+              Already exploring?{" "}
+              <button
+                onClick={() => navigate("/signin")}
+                className="text-white font-black hover:text-purple-400 transition-colors inline-flex items-center gap-1 group/link"
+              >
+                Sign In Instead
+                <ChevronRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
+              </button>
+            </p>
+          </footer>
+        </div>
       </div>
     </div>
   );

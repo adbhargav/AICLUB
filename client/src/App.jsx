@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // Layout Components
 import Header from "./components/Header.jsx";
@@ -44,69 +44,91 @@ function PrivateRoute({ children, role }) {
   return children;
 }
 
+// 🔓 Public Route (Redirects to dashboard if logged in)
+function PublicRoute({ children }) {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (token) {
+    const dashboardPath = role === "admin" ? "/admin" : "/student-dashboard";
+    return <Navigate to={dashboardPath} replace />;
+  }
+
+  return children;
+}
+
+function LayoutContent() {
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith("/admin") || location.pathname.startsWith("/student-dashboard");
+
+  return (
+    <div className="flex flex-col min-h-screen bg-black text-white">
+      {/* Header - Only show on public pages */}
+      {!isDashboard && <Header />}
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        <Routes>
+          {/* Main Pages wrapped in PublicRoute to prevent access when logged in */}
+          <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
+          <Route path="/about" element={<PublicRoute><About /></PublicRoute>} />
+          <Route path="/contact" element={<PublicRoute><Contact /></PublicRoute>} />
+          <Route path="/gallery" element={<PublicRoute><Gallery /></PublicRoute>} />
+          <Route path="/team" element={<PublicRoute><Team /></PublicRoute>} />
+          <Route path="/signin" element={<PublicRoute><SignIn /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
+
+          {/* Student Dashboard Routes */}
+          <Route
+            path="/student-dashboard/*"
+            element={
+              <PrivateRoute role="student">
+                <DashboardLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route path="profile" element={<ViewProfile />} />
+            <Route path="assignments" element={<TakeAssignments />} />
+            <Route path="notices" element={<ViewNotices />} />
+            <Route path="events" element={<ViewEvents />} />
+            <Route path="projects" element={<SubmitProjects />} />
+            <Route path="stats" element={<StatsProgress />} />
+          </Route>
+
+          {/* Admin Dashboard Routes */}
+          <Route
+            path="/admin/*"
+            element={
+              <PrivateRoute role="admin">
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route path="create-event" element={<CreateEvent />} />
+            <Route path="give-assignments" element={<GiveAssignments />} />
+            <Route path="issue-notices" element={<IssueNotices />} />
+            <Route path="upload-gallery" element={<UploadGallery />} />
+            <Route path="create-team" element={<CreateTeamMember />} />
+            <Route path="view-projects" element={<ViewProjects />} />
+            <Route path="view-students" element={<ViewStudents />} />
+            <Route path="view-contacts" element={<ViewContacts />} />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      {/* Footer - Only show on public pages */}
+      {!isDashboard && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen bg-black text-white">
-        {/* Header */}
-        <Header />
-
-        {/* Main Content */}
-        <main className="flex-grow">
-          <Routes>
-            {/* Main Pages */}
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/team" element={<Team />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-
-            {/* Student Dashboard Routes */}
-            <Route
-              path="/student-dashboard/*"
-              element={
-                <PrivateRoute role="student">
-                  <DashboardLayout />
-                </PrivateRoute>
-              }
-            >
-              <Route path="profile" element={<ViewProfile />} />
-              <Route path="assignments" element={<TakeAssignments />} />
-              <Route path="notices" element={<ViewNotices />} />
-              <Route path="events" element={<ViewEvents />} />
-              <Route path="projects" element={<SubmitProjects />} />
-              <Route path="stats" element={<StatsProgress />} />
-            </Route>
-
-            {/* Admin Dashboard Routes */}
-            <Route
-              path="/admin/*"
-              element={
-                <PrivateRoute role="admin">
-                  <AdminLayout />
-                </PrivateRoute>
-              }
-            >
-              <Route path="create-event" element={<CreateEvent />} />
-              <Route path="give-assignments" element={<GiveAssignments />} />
-              <Route path="issue-notices" element={<IssueNotices />} />
-              <Route path="upload-gallery" element={<UploadGallery />} />
-              <Route path="create-team" element={<CreateTeamMember />} />
-              <Route path="view-projects" element={<ViewProjects />} />
-              <Route path="view-students" element={<ViewStudents />} />
-              <Route path="view-contacts" element={<ViewContacts />} />
-            </Route>
-
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-
-        {/* Footer */}
-        <Footer />
-      </div>
+      <LayoutContent />
     </BrowserRouter>
   );
 }
