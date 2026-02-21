@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="bg-white text-gray-900 font-sans">
       {/* 🌟 Hero Section */}
-      <section className="min-h-[85vh] bg-gradient-to-br from-blue-950 via-indigo-900 to-blue-800 text-white flex flex-col md:flex-row justify-center items-center px-6 md:px-16 lg:px-24 overflow-hidden relative">
+      <section className="min-h-screen bg-gradient-to-br from-blue-950 via-indigo-900 to-blue-800 text-white flex flex-col md:flex-row justify-center items-center px-6 md:px-16 lg:px-24 pt-28 pb-16 overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-transparent to-transparent pointer-events-none" />
 
         <div className="md:w-1/2 text-center md:text-left z-10 space-y-6">
