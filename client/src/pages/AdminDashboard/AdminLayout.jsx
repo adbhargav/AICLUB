@@ -43,7 +43,7 @@ export default function AdminLayout() {
   const activeLabel = navLinks.find(link => link.to === currentPath)?.label || "Dashboard";
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#050505] text-white font-sans overflow-hidden">
       {/* Background gradients */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-900/20 blur-[120px] rounded-full"></div>
@@ -60,7 +60,7 @@ export default function AdminLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-72 bg-white/[0.03] backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed md:sticky inset-y-0 left-0 z-50 w-72 h-full bg-white/[0.03] backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="p-8 flex items-center justify-between border-b border-white/10">

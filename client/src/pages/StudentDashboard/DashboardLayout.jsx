@@ -41,7 +41,7 @@ export default function DashboardLayout() {
   const activeLabel = navLinks.find(link => link.to === currentPath)?.label || "Student Dashboard";
 
   return (
-    <div className="flex min-h-screen bg-[#020617] text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#020617] text-white font-sans overflow-hidden">
       {/* Dynamic Background */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-5%] left-[-5%] w-[50%] h-[50%] bg-violet-600/10 blur-[120px] rounded-full"></div>
@@ -58,7 +58,7 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white/[0.02] backdrop-blur-2xl border-r border-white/5 flex flex-col transition-transform duration-500 ease-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed lg:sticky inset-y-0 left-0 z-50 w-72 h-full bg-white/[0.02] backdrop-blur-2xl border-r border-white/5 flex flex-col transition-transform duration-500 ease-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="p-8 flex items-center justify-between border-b border-white/5">
