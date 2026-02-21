@@ -62,7 +62,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-12 text-blue-900">Our Impact</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { label: "Members", end: 7, icon: <FaUsers /> },
+              { label: "Members", end: 50, icon: <FaUsers /> },
               { label: "Projects", end: 3, icon: <FaCodeBranch /> },
               { label: "Events", end: 1, icon: <FaCalendarAlt /> },
               { label: "Workshops", end: 0, icon: <FaLightbulb /> },
